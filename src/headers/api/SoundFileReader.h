@@ -4,9 +4,17 @@
 #include <sndfile.h>
 
 #include "Buffer.h"
+#include <vector>
 
 using namespace iamaprogrammer;
 
 namespace SoundFileReader {
-  void read(std::filesystem::path path, Buffer<float>* buffer);
+
+  struct AudioInfo {
+    std::vector<float> buffer;
+    SF_INFO info;
+  };
+
+  AudioInfo read(std::filesystem::path path);
+  void write(std::filesystem::path path, SF_INFO& fileInfo, std::vector<float>* buffer);
 }

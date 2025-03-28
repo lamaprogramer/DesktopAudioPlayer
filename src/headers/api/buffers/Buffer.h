@@ -26,7 +26,6 @@ namespace iamaprogrammer {
     void resize(int size) {
       T* newData = new T[size];
       std::copy(data, data + this->size, newData);
-      //memcpy(newData, data, sizeof(T) * this->size);
       delete[] data;
       
       this->size = size;
