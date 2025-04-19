@@ -4,13 +4,51 @@
 #include <portaudio.h>
 #include <sndfile.h>
 #include <algorithm>
+#include <filesystem>
+
+#include <RmlUi/Core.h>
+#include <RmlUi/Debugger.h>
+#include <RmlUi_Backend.h>
 
 #include "SoundFileIO.h"
 #include "AudioData.h"
 #include "AudioStream.h"
 
+#include "AppFileInterface.h"
+#include "App.h"
+
+bool processKeyDownShortcuts(Rml::Context* context, Rml::Input::KeyIdentifier key, int key_modifier, float native_dp_ratio, bool priority);
+
 int main(int argc, char* argv[]) {
-  PaError err;
+  App app = App(1080, 540);
+  app.init("VibeTunes");
+
+	std::vector<App::FontFace> fontFaces{
+		{ "fonts/LatoLatin-Regular.ttf", false },
+		{ "fonts/LatoLatin-Italic.ttf", false },
+		{ "fonts/LatoLatin-Bold.ttf", false },
+		{ "fonts/LatoLatin-BoldItalic.ttf", false },
+		{ "fonts/NotoEmoji-Regular.ttf", true },
+	};
+
+	app.initFonts(fontFaces);
+  app.initDocument("app/demo.rml");
+
+
+	bool running = true;
+	while (running) {
+		running = Backend::ProcessEvents(app.getContext(), &processKeyDownShortcuts, true);
+
+		app.getContext()->Update();
+
+		Backend::BeginFrame();
+		app.getContext()->Render();
+		Backend::PresentFrame();
+	}
+
+  app.shutdown();
+
+  /*PaError err;
   err = Pa_Initialize();
   if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
 
@@ -26,6 +64,10 @@ int main(int argc, char* argv[]) {
   audio.end();
 
   err = Pa_Terminate();
-  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
+  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;*/
   return 0;
+}
+
+bool processKeyDownShortcuts(Rml::Context* context, Rml::Input::KeyIdentifier key, int key_modifier, float native_dp_ratio, bool priority) {
+	return true;
 }

@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <sndfile.h>
 #include <vector>
-
+#include <string>
 
 namespace iamaprogrammer {
 

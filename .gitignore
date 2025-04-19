@@ -1,3 +1,7 @@
-/.vscode
-/build
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
 /libs
+/out/build
+/.vs

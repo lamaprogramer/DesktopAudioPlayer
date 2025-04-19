@@ -1,0 +1,14 @@
+<rml>
+	<head>
+		<title>Demo</title>
+    <link type="text/rcss" href="default.rcss"/>
+		<style>
+      body {
+				font-family: LatoLatin;
+      }
+    </style>
+	</head>
+	<body>
+		This is a sample.
+	</body>
+</rml>
