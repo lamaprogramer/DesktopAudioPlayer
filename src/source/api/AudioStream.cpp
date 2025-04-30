@@ -63,9 +63,12 @@ namespace iamaprogrammer {
   }
 
   void AudioStream::stop() {
-    this->error = Pa_StopStream(this->stream);
-    this->handlePaError();
-    this->playingState = PlayingState::STOPPED;
+    if (!Pa_IsStreamStopped(this->stream)) {
+      this->error = Pa_StopStream(this->stream);
+      //this->error = Pa_AbortStream(this->stream);
+      this->handlePaError();
+      this->playingState = PlayingState::STOPPED;
+    }
   }
 
   void AudioStream::end() {

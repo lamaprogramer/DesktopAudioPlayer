@@ -1,0 +1,31 @@
+
+audiocontrol trackbar {
+  background-color: blue;
+}
+
+audiocontrol trackbar slidertrack {
+/*  background-color: blue;
+  height: 100%;*/
+}
+
+audiocontrol trackbar slidertrack:active {
+  background-color: green;
+}
+
+audiocontrol trackbar sliderbar {
+  margin-left: 4px;
+  margin-right: 4px;
+  width: 10px;
+  height: 100%;
+  background-color: red;
+}
+
+/* Animate the bar's decorator on hover. */
+audiocontrol trackbar sliderbar:hover {
+  background-color: red;
+}
+
+/* Animate the bar's decorator on active. */
+audiocontrol trackbar sliderbar:active {
+  background-color: red;
+}

@@ -1,10 +1,13 @@
 #include "App.h"
 
-App::App() {
+#include <RmlUi/Core/Factory.h>
 
+App::App() {
+  this->audioManager = iamaprogrammer::AudioManager();
 }
 
 App::App(int width, int height) {
+  this->audioManager = iamaprogrammer::AudioManager();
   this->width = width;
   this->height = height;
 }
@@ -17,8 +20,10 @@ void App::initFonts(const std::vector<FontFace>& fontFaces) {
 }
 
 void App::initDocument(const std::string documentPath) {
-  if (Rml::ElementDocument* document = context->LoadDocument(this->assetsDir + documentPath))
+  if (Rml::ElementDocument* document = context->LoadDocument(this->assetsDir + documentPath)) {
     document->Show();
+  }
+    
 }
 
 void App::init(std::string name) {
@@ -31,6 +36,9 @@ void App::init(std::string name) {
   Rml::SetRenderInterface(Backend::GetRenderInterface());
   Rml::Initialise();
 
+  this->instancer = Rml::MakeUnique<Rml::ElementInstancerGeneric<AudioController>>(); // TODO: Better handler for custom elements.
+  Rml::Factory::RegisterElementInstancer("audiocontrol", this->instancer.get());
+
   this->context = Rml::CreateContext(name, Rml::Vector2i(this->width, this->height));
   if (!context) {
     Rml::Shutdown();
@@ -41,6 +49,7 @@ void App::init(std::string name) {
 
   if (this->debug) {
     Rml::Debugger::Initialise(context);
+    Rml::Debugger::SetVisible(true);
   }
 }
 

@@ -2,13 +2,15 @@
 	<head>
 		<title>Demo</title>
     <link type="text/rcss" href="default.rcss"/>
+    <link type="text/rcss" href="audiocontrol.rcss"/>
 		<style>
       body {
-				font-family: LatoLatin;
+        font-family: LatoLatin;
       }
     </style>
 	</head>
 	<body>
+    <audiocontrol src="resources/library/01 Spiritfarer.mp3" duration="200"></audiocontrol>
 		This is a sample.
 	</body>
 </rml>

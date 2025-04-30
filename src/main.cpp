@@ -1,11 +1,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
 #include <portaudio.h>
 #include <sndfile.h>
 #include <algorithm>
 #include <filesystem>
 
+#define RMLUI_CUSTOM_RTTI
 #include <RmlUi/Core.h>
 #include <RmlUi/Debugger.h>
 #include <RmlUi_Backend.h>
@@ -14,12 +16,15 @@
 #include "AudioData.h"
 #include "AudioStream.h"
 
-#include "AppFileInterface.h"
 #include "App.h"
 
 bool processKeyDownShortcuts(Rml::Context* context, Rml::Input::KeyIdentifier key, int key_modifier, float native_dp_ratio, bool priority);
 
 int main(int argc, char* argv[]) {
+  PaError err;
+  err = Pa_Initialize();
+  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
+
   App app = App(1080, 540);
   app.init("VibeTunes");
 
@@ -48,6 +53,9 @@ int main(int argc, char* argv[]) {
 
   app.shutdown();
 
+  err = Pa_Terminate();
+  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
+
   /*PaError err;
   err = Pa_Initialize();
   if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
@@ -61,10 +69,7 @@ int main(int argc, char* argv[]) {
   audio.start();
   Pa_Sleep(10000);
 
-  audio.end();
-
-  err = Pa_Terminate();
-  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;*/
+  audio.end();;*/
   return 0;
 }
 

@@ -3,9 +3,13 @@
 #include <iostream>
 #include <string>
 
+#define RMLUI_CUSTOM_RTTI
 #include <RmlUi/Core.h>
 #include <RmlUi/Debugger.h>
 #include <RmlUi_Backend.h>
+
+#include "AudioManager.h";
+#include "AudioController.h"
 
 class App {
 public:
@@ -27,6 +31,7 @@ public:
   Rml::Context* getContext();
 
 private:
+  iamaprogrammer::AudioManager audioManager;
   Rml::Context* context;
 
   int width = 1080;
@@ -35,4 +40,6 @@ private:
   bool debug = false;
 
   std::string assetsDir = "assets/";
+
+  Rml::UniquePtr<Rml::ElementInstancerGeneric<AudioController>> instancer;
 };
