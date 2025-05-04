@@ -16,8 +16,8 @@ namespace iamaprogrammer {
     }
 
     this->reader = AudioReader(this->filePath);
-    std::cout << this->reader.getAudioData()->frames << std::endl;
-    std::cout << this->reader.getAudioData()->sampleRate << std::endl;
+    //std::cout << this->reader.getAudioData()->frames << std::endl;
+   // std::cout << this->reader.getAudioData()->sampleRate << std::endl;
 
     PaDeviceIndex device = Pa_GetDefaultOutputDevice();
     const PaDeviceInfo* deviceInfo = Pa_GetDeviceInfo(device);
@@ -32,13 +32,17 @@ namespace iamaprogrammer {
 
     this->audioReaderThread = std::thread([this](){ audioReaderThreadCallback(); });
 
-    this->audioBuffer = AudioBuffer{&audioData};
+    this->audioBuffer = AudioBuffer{
+      &audioData,
+      &this->audioChunks,
+    };
+
     this->error = Pa_OpenStream(
       &this->stream, 
       NULL, 
       &outputParameters, 
       deviceInfo->defaultSampleRate, 
-      paFramesPerBufferUnspecified, 
+      1024, // paFramesPerBufferUnspecified
       paNoFlag, 
       paCallback, 
       &audioBuffer
@@ -49,21 +53,37 @@ namespace iamaprogrammer {
   }
 
   void AudioStream::start() {
-    this->error = Pa_StartStream(this->stream);
-    this->handlePaError();
-  
-    this->playingState = PlayingState::PLAYING;
-    std::cout << "Stream started" << std::endl;
+    if (Pa_IsStreamStopped(this->stream)) {
+      this->error = Pa_StartStream(this->stream);
+      this->handlePaError();
+
+      this->playingState = PlayingState::PLAYING;
+    }
+    //std::cout << "Stream started" << std::endl;
   }
 
   void AudioStream::seek(float seconds) {
+    while (this->audioChunks.size() > 0) {
+      this->audioChunks.pop();
+    }
+
     long frames = seconds * this->reader.getAudioData()->sampleRate;
+    this->reader.seek(frames);
+
+    /*
+    TODO:
+     - Implement seek() method in AudioReader with sf_seek()
+
+     - Handle thread safety
+
+    */
+
     this->audioBuffer.seekOffset = frames;
     this->audioBuffer.seeking = true;
   }
 
   void AudioStream::stop() {
-    if (!Pa_IsStreamStopped(this->stream)) {
+    if (Pa_IsStreamActive(this->stream)) {
       this->error = Pa_StopStream(this->stream);
       //this->error = Pa_AbortStream(this->stream);
       this->handlePaError();
@@ -93,6 +113,7 @@ namespace iamaprogrammer {
   AudioStream::PlayingState AudioStream::getPlayingState() {
     return this->playingState;
   }
+
   AudioStream::StreamState AudioStream::getStreamState() {
     return this->streamState;
   }
@@ -113,7 +134,19 @@ namespace iamaprogrammer {
   }
 
   void AudioStream::audioReaderThreadCallback() {
-    while (this->reader.read(1024) > 0) {}
+    while (true) {
+      if (this->audioChunks.size() >= this->MAX_LOADED_CHUNKS) {
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        continue;
+      }
+
+      long long readSize = this->reader.read(this->audioChunks, 1024);
+
+      if (readSize <= 0) {
+        //std::cout << "End of stream" << std::endl;
+        break;
+      }
+    }
     this->reader.close();
   }
 }

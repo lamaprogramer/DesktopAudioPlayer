@@ -18,7 +18,7 @@ add_executable(${PROJECT_NAME}
 	src/source/api/SoundFileIO.cpp
 	src/source/app/AppFileInterface.cpp
   src/source/app/App.cpp
-  src/source/app/elements/AudioController.cpp "src/headers/api/Playlist.h" "src/source/api/AudioManager.cpp" "src/source/api/Playlist.cpp" "src/headers/api/AudioRegistry.h") # Define executable files
+  src/source/app/elements/AudioController.cpp "src/headers/api/Playlist.h" "src/source/api/AudioManager.cpp" "src/source/api/Playlist.cpp" "src/headers/api/AudioRegistry.h" "src/headers/api/AudioChunk.h" "src/source/api/AudioChunk.cpp") # Define executable files
 
 target_include_directories(${PROJECT_NAME}
   PRIVATE ${CMAKE_SOURCE_DIR}/libs/portaudio/include

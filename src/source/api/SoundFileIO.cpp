@@ -19,22 +19,21 @@ namespace iamaprogrammer {
       std::cout << "Error opening file: " << pathCStr << std::endl;
     }
 
-    this->data.buffer = std::vector<float>(info.frames*info.channels);
     this->data.frames = info.frames;
     this->data.channels = info.channels;
     this->data.sampleRate = info.samplerate;
   }
 
-  long long AudioReader::read(long bufferSize) {
-    std::vector<float> buffer(bufferSize*this->data.channels);
-    long long readCount = sf_readf_float(this->file, buffer.data(), bufferSize);
+  long long AudioReader::read(std::queue<AudioChunk>& buffer, long bufferSize) {
+    AudioChunk chunk(bufferSize*this->data.channels);
+    long long readCount = sf_readf_float(this->file, chunk.data()->data(), bufferSize);
+   
     if (readCount > 0) {
-      if (readCount < bufferSize) {
+      /*if (readCount < bufferSize) {
         buffer.resize(readCount*this->data.channels);
-      }
-      
-      std::copy(buffer.begin(), buffer.end(), this->data.buffer.begin()+this->offset);
-      offset += readCount*this->data.channels;
+      }*/
+      //std::cout << "read chunk" << std::endl;
+      buffer.push(chunk); 
     }
     return readCount;
   }

@@ -4,7 +4,10 @@
 #include <filesystem>
 #include <sndfile.h>
 #include <vector>
+#include <queue>
 #include <string>
+
+#include "AudioChunk.h"
 
 namespace iamaprogrammer {
 
@@ -13,7 +16,9 @@ namespace iamaprogrammer {
       AudioReader();
       AudioReader(std::filesystem::path filePath);
 
-      long long read(long bufferSize);
+      long long read(std::queue<AudioChunk>& buffer, long bufferSize);
+      void seek(long offset);
+
       AudioData* getAudioData();
 
       AudioData close();
@@ -22,7 +27,6 @@ namespace iamaprogrammer {
       std::filesystem::path path;
       SNDFILE* file;
       AudioData data;
-      int offset = 0;
   };
 
   class AudioWriter {

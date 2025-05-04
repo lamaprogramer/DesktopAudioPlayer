@@ -4,9 +4,11 @@
 #include <portaudio.h>
 #include <filesystem>
 #include <vector>
+#include <queue>
 #include <mutex>
 #include <thread>
 
+#include "AudioChunk.h"
 #include "AudioData.h"
 #include "SoundFileIO.h"
 
@@ -42,8 +44,12 @@ namespace iamaprogrammer {
       StreamState getStreamState();
 
     private:
+      int CHUNK_SIZE = 1024;
+      int MAX_LOADED_CHUNKS = 10;
+
       struct AudioBuffer {
         iamaprogrammer::AudioData* data;
+        std::queue<AudioChunk>* buffer;
         bool seeking = false;
         long seekOffset = 0;
         long start = 0;
@@ -52,6 +58,11 @@ namespace iamaprogrammer {
       // Essential
       std::filesystem::path filePath;
       iamaprogrammer::AudioReader reader;
+
+      std::queue<iamaprogrammer::AudioChunk> audioChunks;
+      std::mutex audioChunksMutex;
+
+
       std::thread audioReaderThread;
 
       std::mutex audioBufferMutex;
@@ -75,16 +86,22 @@ namespace iamaprogrammer {
       ) {
         float* out = static_cast<float*>(outputBuffer);
         AudioBuffer* audioBuffer = static_cast<AudioBuffer*>(userData);
+        AudioChunk chunk = audioBuffer->buffer->front();
+        audioBuffer->buffer->pop();
+        //std::cout << "popped chunk" << std::endl;
 
         if (audioBuffer->seeking) {
           audioBuffer->start += audioBuffer->seekOffset * audioBuffer->data->channels;
           audioBuffer->seeking = false;
         }
 
+        long pos = 0;
         for (unsigned long i = 0; i < framesPerBuffer; i++) {
           for (int channelOffset = 0; channelOffset < audioBuffer->data->channels; channelOffset++) {
-            *out++ = audioBuffer->data->buffer.at(audioBuffer->start + channelOffset);
+            *out++ = chunk.data()->at(pos + channelOffset);
           }
+
+          pos += audioBuffer->data->channels;
           audioBuffer->start += audioBuffer->data->channels;
         }
 

@@ -24,8 +24,14 @@ int main(int argc, char* argv[]) {
   PaError err;
   err = Pa_Initialize();
   if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
+  iamaprogrammer::AudioStream audio = iamaprogrammer::AudioStream(std::filesystem::current_path() / "resources\\library\\01 Spiritfarer.mp3");
+  audio.setup();
+  audio.start();
+  Pa_Sleep(10000);
+  audio.stop();
+  audio.end();
 
-  App app = App(1080, 540);
+  /*App app = App(1080, 540);
   app.init("VibeTunes");
 
 	std::vector<App::FontFace> fontFaces{
@@ -51,7 +57,7 @@ int main(int argc, char* argv[]) {
 		Backend::PresentFrame();
 	}
 
-  app.shutdown();
+  app.shutdown();*/
 
   err = Pa_Terminate();
   if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
