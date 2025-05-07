@@ -8,7 +8,10 @@
 namespace iamaprogrammer {
   AudioReader::AudioReader() {}
 
-  AudioReader::AudioReader(std::filesystem::path filePath) {
+  AudioReader::AudioReader(std::filesystem::path filePath, int deviceSampleRate, int readSize): 
+    deviceSampleRate(deviceSampleRate), 
+    readSize(readSize)
+  {
     SF_INFO info;
 
     std::string pathStr = filePath.string();
@@ -22,28 +25,62 @@ namespace iamaprogrammer {
     this->data.frames = info.frames;
     this->data.channels = info.channels;
     this->data.sampleRate = info.samplerate;
+
+    std::cout << info.samplerate << std::endl;
+    std::cout << this->deviceSampleRate << std::endl;
+
+
+    // Set up read buffer and initialize sample rate converter.
+    this->readBuffer = std::vector<float>(readSize * info.channels);
+    this->srcState = src_new(SRC_SINC_FASTEST, info.channels, &this->error);
+
+    this->srcData.data_in = this->readBuffer.data();
+
+    std::cout << this->getSampleRateRatio() << std::endl;
+    this->srcData.input_frames = readSize;
+    this->srcData.output_frames = readSize * this->getSampleRateRatio();
+    this->srcData.src_ratio = this->getSampleRateRatio();
+    this->srcData.end_of_input = 0;
   }
 
-  long long AudioReader::read(std::queue<AudioChunk>& buffer, long bufferSize) {
-    AudioChunk chunk(bufferSize*this->data.channels);
-    long long readCount = sf_readf_float(this->file, chunk.data()->data(), bufferSize);
-   
+  long long AudioReader::read(std::queue<AudioChunk>& buffer) {
+    AudioChunk chunk((this->readSize * this->getSampleRateRatio()) * this->data.channels); 
+
+    long long readCount = sf_readf_float(this->file, this->readBuffer.data(), this->readSize);
+    this->srcData.data_out = chunk.data()->data();
+    int e = src_process(this->srcState, &this->srcData);
+
+    if (this->getSampleRateRatio() == 1.0) { // The ratio is the same, no need to convert.
+      *(chunk.data()) = this->readBuffer;
+    } else {
+      this->srcData.data_out = chunk.data()->data();
+      int e = src_process(this->srcState, &this->srcData);
+    }
+
     if (readCount > 0) {
       /*if (readCount < bufferSize) {
         buffer.resize(readCount*this->data.channels);
       }*/
-      //std::cout << "read chunk" << std::endl;
       buffer.push(chunk); 
     }
     return readCount;
+  }
+
+  void AudioReader::seek(long long frames, int whence) {
+    sf_seek(this->file, frames, whence);
   }
 
   AudioData* AudioReader::getAudioData() {
     return &this->data;
   }
 
+  double AudioReader::getSampleRateRatio() {
+    return (double)this->deviceSampleRate / this->data.sampleRate;
+  }
+
   AudioData AudioReader::close() {
     sf_close(file);
+    src_delete(srcState);
     return this->data;
   }
 }

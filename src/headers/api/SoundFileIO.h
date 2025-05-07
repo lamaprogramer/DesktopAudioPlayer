@@ -2,10 +2,12 @@
 
 #include "AudioData.h"
 #include <filesystem>
-#include <sndfile.h>
 #include <vector>
 #include <queue>
 #include <string>
+
+#include <samplerate.h>
+#include <sndfile.h>
 
 #include "AudioChunk.h"
 
@@ -14,19 +16,30 @@ namespace iamaprogrammer {
   class AudioReader {
     public:
       AudioReader();
-      AudioReader(std::filesystem::path filePath);
+      AudioReader(std::filesystem::path filePath, int deviceSampleRate, int readSize);
 
-      long long read(std::queue<AudioChunk>& buffer, long bufferSize);
-      void seek(long offset);
+      long long read(std::queue<AudioChunk>& buffer);
+      void seek(long long frames, int whence);
 
       AudioData* getAudioData();
+      double getSampleRateRatio();
 
       AudioData close();
 
     private:
       std::filesystem::path path;
       SNDFILE* file;
+      SRC_STATE* srcState; // Samplerate Converter state
+      SRC_DATA srcData; // Samplerate Converter data
       AudioData data;
+
+      std::vector<float> readBuffer;
+
+      int error = 0;
+
+      int readSize = 0;
+      int deviceSampleRate = 0;
+      double sampleRateRatio = 1.0;
   };
 
   class AudioWriter {

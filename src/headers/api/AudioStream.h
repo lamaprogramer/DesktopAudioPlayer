@@ -22,6 +22,7 @@ namespace iamaprogrammer {
       
       enum PlayingState {
         PLAYING,
+        SEEKING,
         STOPPED,
         BUFFERING
       };
@@ -44,12 +45,14 @@ namespace iamaprogrammer {
       StreamState getStreamState();
 
     private:
-      int CHUNK_SIZE = 1024;
-      int MAX_LOADED_CHUNKS = 10;
+      static int READ_SIZE;
+      static int MAX_LOADED_CHUNKS;
 
       struct AudioBuffer {
         iamaprogrammer::AudioData* data;
         std::queue<AudioChunk>* buffer;
+        std::mutex* bufferMutex;
+
         bool seeking = false;
         long seekOffset = 0;
         long start = 0;
@@ -62,10 +65,7 @@ namespace iamaprogrammer {
       std::queue<iamaprogrammer::AudioChunk> audioChunks;
       std::mutex audioChunksMutex;
 
-
       std::thread audioReaderThread;
-
-      std::mutex audioBufferMutex;
       AudioBuffer audioBuffer;
       PaStream* stream;
 
@@ -86,9 +86,9 @@ namespace iamaprogrammer {
       ) {
         float* out = static_cast<float*>(outputBuffer);
         AudioBuffer* audioBuffer = static_cast<AudioBuffer*>(userData);
+
         AudioChunk chunk = audioBuffer->buffer->front();
         audioBuffer->buffer->pop();
-        //std::cout << "popped chunk" << std::endl;
 
         if (audioBuffer->seeking) {
           audioBuffer->start += audioBuffer->seekOffset * audioBuffer->data->channels;

@@ -4,6 +4,10 @@
 #include <string>
 
 namespace iamaprogrammer {
+  int AudioStream::READ_SIZE = 1024;
+  int AudioStream::MAX_LOADED_CHUNKS = 10;
+
+
   AudioStream::AudioStream() {};
 
   AudioStream::AudioStream(std::filesystem::path filePath) {
@@ -14,15 +18,17 @@ namespace iamaprogrammer {
     if (this->streamState == StreamState::OPEN) {
       throw std::runtime_error("Stream is already open.");
     }
+    this->streamState = StreamState::OPEN;
 
-    this->reader = AudioReader(this->filePath);
-    //std::cout << this->reader.getAudioData()->frames << std::endl;
-   // std::cout << this->reader.getAudioData()->sampleRate << std::endl;
 
     PaDeviceIndex device = Pa_GetDefaultOutputDevice();
     const PaDeviceInfo* deviceInfo = Pa_GetDeviceInfo(device);
 
+    this->reader = AudioReader(this->filePath, deviceInfo->defaultSampleRate, READ_SIZE);
     AudioData& audioData = *this->reader.getAudioData();
+
+    //long long bufferSize = CHUNK_SIZE * this->reader.getSampleRateRatio();
+
     PaStreamParameters outputParameters;
     outputParameters.device = device;
     outputParameters.channelCount = audioData.channels;
@@ -30,11 +36,12 @@ namespace iamaprogrammer {
     outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
-    this->audioReaderThread = std::thread([this](){ audioReaderThreadCallback(); });
+    this->audioReaderThread = std::thread([this](){ audioReaderThreadCallback(); }); // Start reader thread.
 
     this->audioBuffer = AudioBuffer{
       &audioData,
       &this->audioChunks,
+      &this->audioChunksMutex
     };
 
     this->error = Pa_OpenStream(
@@ -42,13 +49,13 @@ namespace iamaprogrammer {
       NULL, 
       &outputParameters, 
       deviceInfo->defaultSampleRate, 
-      1024, // paFramesPerBufferUnspecified
+      READ_SIZE * this->reader.getSampleRateRatio(), // paFramesPerBufferUnspecified
       paNoFlag, 
       paCallback, 
       &audioBuffer
     );
+
     this->handlePaError();
-    this->streamState = StreamState::OPEN;
     std::cout << "Stream opened" << std::endl;
   }
 
@@ -59,27 +66,22 @@ namespace iamaprogrammer {
 
       this->playingState = PlayingState::PLAYING;
     }
-    //std::cout << "Stream started" << std::endl;
   }
 
   void AudioStream::seek(float seconds) {
-    while (this->audioChunks.size() > 0) {
+    this->playingState = PlayingState::SEEKING;
+
+    while (this->audioChunks.size() > 0) { // Clear chunk buffer
       this->audioChunks.pop();
     }
 
     long frames = seconds * this->reader.getAudioData()->sampleRate;
-    this->reader.seek(frames);
-
-    /*
-    TODO:
-     - Implement seek() method in AudioReader with sf_seek()
-
-     - Handle thread safety
-
-    */
+    this->reader.seek(frames, SEEK_CUR);
 
     this->audioBuffer.seekOffset = frames;
     this->audioBuffer.seeking = true;
+
+    this->playingState = PlayingState::PLAYING;
   }
 
   void AudioStream::stop() {
@@ -95,6 +97,7 @@ namespace iamaprogrammer {
     if (this->streamState == StreamState::CLOSED) {
       throw std::runtime_error("Stream is already closed.");
     }
+    this->streamState = StreamState::CLOSED;
 
     this->error = Pa_CloseStream(this->stream);
     this->handlePaError();
@@ -102,7 +105,6 @@ namespace iamaprogrammer {
     if (this->audioReaderThread.joinable()) {
       this->audioReaderThread.join();
     }
-    this->streamState = StreamState::CLOSED;
     std::cout << "Stream closed" << std::endl;
   }
 
@@ -135,17 +137,15 @@ namespace iamaprogrammer {
 
   void AudioStream::audioReaderThreadCallback() {
     while (true) {
-      if (this->audioChunks.size() >= this->MAX_LOADED_CHUNKS) {
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      if (this->streamState == StreamState::CLOSED) {
+        break;
+      }
+
+      if (this->audioChunks.size() >= this->MAX_LOADED_CHUNKS || this->getPlayingState() == PlayingState::SEEKING) {
         continue;
       }
 
-      long long readSize = this->reader.read(this->audioChunks, 1024);
-
-      if (readSize <= 0) {
-        //std::cout << "End of stream" << std::endl;
-        break;
-      }
+      long long readSize = this->reader.read(this->audioChunks);
     }
     this->reader.close();
   }

@@ -28,9 +28,10 @@ int main(int argc, char* argv[]) {
   audio.setup();
   audio.start();
   Pa_Sleep(10000);
+  //audio.seek(-3);
+  //Pa_Sleep(10000);
   audio.stop();
   audio.end();
-
   /*App app = App(1080, 540);
   app.init("VibeTunes");
 
