@@ -26,35 +26,27 @@ namespace iamaprogrammer {
     this->data.channels = info.channels;
     this->data.sampleRate = info.samplerate;
 
-    std::cout << info.samplerate << std::endl;
-    std::cout << this->deviceSampleRate << std::endl;
-
-
     // Set up read buffer and initialize sample rate converter.
     this->readBuffer = std::vector<float>(readSize * info.channels);
     this->srcState = src_new(SRC_SINC_FASTEST, info.channels, &this->error);
 
     this->srcData.data_in = this->readBuffer.data();
-
-    std::cout << this->getSampleRateRatio() << std::endl;
     this->srcData.input_frames = readSize;
     this->srcData.output_frames = readSize * this->getSampleRateRatio();
     this->srcData.src_ratio = this->getSampleRateRatio();
     this->srcData.end_of_input = 0;
   }
 
-  long long AudioReader::read(std::queue<AudioChunk>& buffer) {
+  size_t AudioReader::read(std::queue<AudioChunk>& buffer) {
     AudioChunk chunk((this->readSize * this->getSampleRateRatio()) * this->data.channels); 
 
     long long readCount = sf_readf_float(this->file, this->readBuffer.data(), this->readSize);
-    this->srcData.data_out = chunk.data()->data();
-    int e = src_process(this->srcState, &this->srcData);
 
     if (this->getSampleRateRatio() == 1.0) { // The ratio is the same, no need to convert.
       *(chunk.data()) = this->readBuffer;
     } else {
       this->srcData.data_out = chunk.data()->data();
-      int e = src_process(this->srcState, &this->srcData);
+      src_process(this->srcState, &this->srcData);
     }
 
     if (readCount > 0) {
@@ -66,7 +58,7 @@ namespace iamaprogrammer {
     return readCount;
   }
 
-  void AudioReader::seek(long long frames, int whence) {
+  void AudioReader::seek(size_t frames, int whence) {
     sf_seek(this->file, frames, whence);
   }
 
@@ -78,10 +70,9 @@ namespace iamaprogrammer {
     return (double)this->deviceSampleRate / this->data.sampleRate;
   }
 
-  AudioData AudioReader::close() {
+  void AudioReader::close() {
     sf_close(file);
     src_delete(srcState);
-    return this->data;
   }
 }
 

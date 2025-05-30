@@ -18,6 +18,7 @@ namespace iamaprogrammer {
     void removeStream();
 
     void loadPlaylists();
+
   private:
     std::map<std::string, Playlist> playlists;
     std::map<std::string, AudioStream> currentStreams;

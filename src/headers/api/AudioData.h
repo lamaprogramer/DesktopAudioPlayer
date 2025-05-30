@@ -4,7 +4,7 @@
 
 namespace iamaprogrammer {
   struct AudioData {
-    long long frames;
+    size_t frames;
     int sampleRate;
     int channels;
   };

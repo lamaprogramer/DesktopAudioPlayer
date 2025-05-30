@@ -1,4 +1,5 @@
 #include "Playlist.h"
+#include <algorithm>
 
 namespace iamaprogrammer {
   Playlist::Playlist() {
@@ -9,19 +10,52 @@ namespace iamaprogrammer {
     this->name = name;
   }
 
+  Playlist::Playlist(std::vector<std::string> audio, std::string name) {
+    this->audio = audio;
+    this->name = name;
+  }
+
   void Playlist::add(std::string name) {
     this->audio.push_back(name);
   }
 
-  void Playlist::remove(std::string name) {
+  void Playlist::remove(const std::string& name) {
     this->audio.erase(std::find(this->audio.begin(), this->audio.end(), name));
   }
 
-  void Playlist::writeTo(std::filesystem::path filePath) {
+  Playlist Playlist::load(std::filesystem::path filePath) {
+    std::filesystem::path filename = filePath.filename().stem();
+    //std::cout << this->playlistDir / filename << std::endl;
 
-  }
+    if (!std::filesystem::exists(filePath)) {
+      std::cout << "Playlist file does not exist. Creating new playlist." << std::endl;
+      std::filesystem::create_directories(filePath.parent_path());
 
-  Playlist Playlist::loadFrom(std::filesystem::path filePath) {
-    return Playlist();
+      std::ofstream file(filePath);
+      if (file.is_open()) {
+        file.close();
+      }
+
+      return Playlist(filename.string());
+    }
+
+    // Read the playlist file
+    std::ifstream file(filePath);
+    std::vector<std::string> audioFiles;
+
+    if (file.is_open()) {
+      std::string line;
+      long readLines = 0;
+
+      while (std::getline(file, line)) {
+        if (line.empty()) continue; // Skip empty lines
+
+        audioFiles.push_back(line);
+        readLines++;
+      }
+      file.close();
+    }
+
+    return Playlist(audioFiles, filename.string());
   }
 }

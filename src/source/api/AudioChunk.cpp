@@ -2,9 +2,7 @@
 
 namespace iamaprogrammer {
 
-  AudioChunk::AudioChunk() {
-
-  }
+  AudioChunk::AudioChunk() {}
 
   AudioChunk::AudioChunk(long size) : size(size) {
     this->buffer = std::vector<float>(size);

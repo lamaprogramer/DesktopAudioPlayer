@@ -15,23 +15,48 @@
 #include "SoundFileIO.h"
 #include "AudioData.h"
 #include "AudioStream.h"
+#include "AudioRegistry.h"
+#include "Playlist.h"
 
 #include "App.h"
+
+#include "md5.h"
 
 bool processKeyDownShortcuts(Rml::Context* context, Rml::Input::KeyIdentifier key, int key_modifier, float native_dp_ratio, bool priority);
 
 int main(int argc, char* argv[]) {
-  PaError err;
+
+  iamaprogrammer::AudioRegistry::load("resources/library");
+  /*MD5_CTX md5Context;
+  unsigned char result[16];
+
+  MD5_Init(&md5Context);
+  MD5_Update(&md5Context, "Hello, World!", 13);
+  MD5_Final(result, &md5Context);
+
+  MDPrint(result);*/
+	
+  //iamaprogrammer::Playlist playlist = iamaprogrammer::Playlist::load("resources/playlists/test.txt");
+
+	
+
+  /*PaError err;
   err = Pa_Initialize();
   if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
+
   iamaprogrammer::AudioStream audio = iamaprogrammer::AudioStream(std::filesystem::current_path() / "resources\\library\\01 Spiritfarer.mp3");
   audio.setup();
   audio.start();
   Pa_Sleep(10000);
-  //audio.seek(-3);
-  //Pa_Sleep(10000);
+  audio.seek(-3);
+  Pa_Sleep(10000);
   audio.stop();
   audio.end();
+
+	err = Pa_Terminate();
+	if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;*/
+
+
   /*App app = App(1080, 540);
   app.init("VibeTunes");
 
@@ -59,24 +84,6 @@ int main(int argc, char* argv[]) {
 	}
 
   app.shutdown();*/
-
-  err = Pa_Terminate();
-  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
-
-  /*PaError err;
-  err = Pa_Initialize();
-  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
-
-  iamaprogrammer::AudioStream audio = iamaprogrammer::AudioStream(std::filesystem::current_path() / "resources\\audio\\test.mp3");
-  audio.setup();
-  audio.start();
-  Pa_Sleep(10000);
-  audio.stop();
-  Pa_Sleep(5000);
-  audio.start();
-  Pa_Sleep(10000);
-
-  audio.end();;*/
   return 0;
 }
 

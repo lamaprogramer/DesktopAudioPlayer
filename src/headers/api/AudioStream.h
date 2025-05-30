@@ -48,10 +48,9 @@ namespace iamaprogrammer {
       static int READ_SIZE;
       static int MAX_LOADED_CHUNKS;
 
-      struct AudioBuffer {
+      struct AudioStreamData {
         iamaprogrammer::AudioData* data;
         std::queue<AudioChunk>* buffer;
-        std::mutex* bufferMutex;
 
         bool seeking = false;
         long seekOffset = 0;
@@ -62,11 +61,9 @@ namespace iamaprogrammer {
       std::filesystem::path filePath;
       iamaprogrammer::AudioReader reader;
 
-      std::queue<iamaprogrammer::AudioChunk> audioChunks;
-      std::mutex audioChunksMutex;
-
+      std::queue<iamaprogrammer::AudioChunk> audioBuffer;
+      AudioStreamData audioStreamData;
       std::thread audioReaderThread;
-      AudioBuffer audioBuffer;
       PaStream* stream;
 
       // State
@@ -85,24 +82,24 @@ namespace iamaprogrammer {
         void *userData 
       ) {
         float* out = static_cast<float*>(outputBuffer);
-        AudioBuffer* audioBuffer = static_cast<AudioBuffer*>(userData);
+        AudioStreamData* streamData = static_cast<AudioStreamData*>(userData);
 
-        AudioChunk chunk = audioBuffer->buffer->front();
-        audioBuffer->buffer->pop();
+        AudioChunk chunk = streamData->buffer->front();
+        streamData->buffer->pop();
 
-        if (audioBuffer->seeking) {
-          audioBuffer->start += audioBuffer->seekOffset * audioBuffer->data->channels;
-          audioBuffer->seeking = false;
+        if (streamData->seeking) {
+          streamData->start += streamData->seekOffset * streamData->data->channels;
+          streamData->seeking = false;
         }
 
         long pos = 0;
         for (unsigned long i = 0; i < framesPerBuffer; i++) {
-          for (int channelOffset = 0; channelOffset < audioBuffer->data->channels; channelOffset++) {
+          for (int channelOffset = 0; channelOffset < streamData->data->channels; channelOffset++) {
             *out++ = chunk.data()->at(pos + channelOffset);
           }
 
-          pos += audioBuffer->data->channels;
-          audioBuffer->start += audioBuffer->data->channels;
+          pos += streamData->data->channels;
+          streamData->start += streamData->data->channels;
         }
 
         return paContinue;
