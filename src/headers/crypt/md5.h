@@ -28,18 +28,82 @@
 #elif !defined(_MD5_H)
 #define _MD5_H
 
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <iostream>
+
 /* Any 32-bit or wider unsigned integer data type will do */
 typedef unsigned int MD5_u32plus;
-
+//typedef unsigned char md5_hash[16]; // Added by Iamaprogrammer
 typedef struct {
-	MD5_u32plus lo, hi;
-	MD5_u32plus a, b, c, d;
-	unsigned char buffer[64];
-	MD5_u32plus block[16];
+  MD5_u32plus lo, hi;
+  MD5_u32plus a, b, c, d;
+  unsigned char buffer[64];
+  MD5_u32plus block[16];
 } MD5_CTX;
 
-extern void MD5_Init(MD5_CTX *ctx);
-extern void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size);
-extern void MD5_Final(unsigned char *result, MD5_CTX *ctx);
+class md5_hash {
+public:
+  md5_hash(MD5_u32plus a, MD5_u32plus b, MD5_u32plus c, MD5_u32plus d);
+
+  unsigned char operator[](int index) const {
+    return hash[index];
+  }
+
+	bool operator==(const md5_hash &hash1) const {
+    return this->to_string() == hash1.to_string();
+	}
+
+  bool operator<(const md5_hash &hash1) const {
+    return this->to_string() < hash1.to_string();
+  }
+
+  bool operator>(const md5_hash &hash1) const {
+    return this->to_string() > hash1.to_string();
+  }
+
+  md5_hash operator=(const unsigned char data[16]) {
+    for (int i = 0; i < 16; i++) {
+      hash[i] = data[i];
+    }
+    return *this;
+  }
+
+  std::string to_string() const;
+  static md5_hash from_string(const std::string& str);
+
+  operator const unsigned char* () {
+    return hash;
+  }
+
+private:
+	unsigned char hash[16];
+
+  md5_hash(unsigned char data[16]);
+};
+
+
+class md5_builder {
+public:
+  md5_builder();
+
+  void update(const void* data, unsigned long size);
+  md5_hash finalize();
+
+private:
+  MD5_CTX ctx;
+
+  void* body(const void* data, unsigned long size);
+};
+
+namespace std {
+  template <>
+  struct hash<md5_hash> {
+    std::size_t operator()(const md5_hash& k) const {
+      return std::hash<std::string>()(k.to_string());
+    }
+  };
+}
 
 #endif

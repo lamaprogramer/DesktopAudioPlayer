@@ -11,8 +11,8 @@ namespace iamaprogrammer {
   public:
     AudioManager();
 
-    void addAudioToPlaylist(std::string playlist, std::string audio);
-    void removeAudioFromPlaylist(std::string playlist, std::string audio);
+    /*void addAudioToPlaylist(std::string playlist, std::string audio);
+    void removeAudioFromPlaylist(std::string playlist, std::string audio);*/
 
     void addStream(std::string name);
     void removeStream();

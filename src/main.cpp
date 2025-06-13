@@ -25,8 +25,36 @@
 bool processKeyDownShortcuts(Rml::Context* context, Rml::Input::KeyIdentifier key, int key_modifier, float native_dp_ratio, bool priority);
 
 int main(int argc, char* argv[]) {
+  iamaprogrammer::AudioRegistry audioRegistry;
+  audioRegistry.load("resources/library");
 
-  iamaprogrammer::AudioRegistry::load("resources/library");
+  const std::vector<iamaprogrammer::AudioFileEntry> sortedEntries = audioRegistry.getSortedEntries(
+    [](const iamaprogrammer::AudioFileEntry& a, const iamaprogrammer::AudioFileEntry& b) {
+      return a.second.filename > b.second.filename; // Sort by hash
+    }
+  );
+
+  for (const auto& entry : sortedEntries) {
+    std::cout << "File: " << entry.second.filename << " Hash: ";
+    std::cout << entry.first.to_string() << std::endl;
+  }
+
+
+  md5_builder builder;
+  builder.update("Hello, World!", 13);
+  md5_hash hash = builder.finalize();
+
+  std::string str_hash = hash.to_string();
+
+  std::cout << "Hash1: " << str_hash << std::endl;
+
+  md5_hash hash2 = md5_hash::from_string(str_hash);
+
+  std::cout << "Hash2: " << hash2.to_string() << std::endl;
+
+  //iamaprogrammer::AudioRegistry::MDPrint(hash);
+  //65a8e27d8879283831b664bd8b7fad4
+  //65a8e27d8879283831b664bd8b7f0ad4
   /*MD5_CTX md5Context;
   unsigned char result[16];
 

@@ -35,6 +35,10 @@
  * compile-time configuration.
  */
 
+/*
+* Modified By Iamaprogrammer to use a class-based interface.
+*/
+
 #ifndef HAVE_OPENSSL
 
 #include <string.h>
@@ -84,20 +88,39 @@
 	SET(n)
 #else
 #define SET(n) \
-	(ctx->block[(n)] = \
+	(ctx.block[(n)] = \
 	(MD5_u32plus)ptr[(n) * 4] | \
 	((MD5_u32plus)ptr[(n) * 4 + 1] << 8) | \
 	((MD5_u32plus)ptr[(n) * 4 + 2] << 16) | \
 	((MD5_u32plus)ptr[(n) * 4 + 3] << 24))
 #define GET(n) \
-	(ctx->block[(n)])
+	(ctx.block[(n)])
 #endif
+
+#define OUT(dst, src) \
+	(dst)[0] = (unsigned char)(src); \
+	(dst)[1] = (unsigned char)((src) >> 8); \
+	(dst)[2] = (unsigned char)((src) >> 16); \
+	(dst)[3] = (unsigned char)((src) >> 24);
+
+md5_hash::md5_hash(MD5_u32plus a, MD5_u32plus b, MD5_u32plus c, MD5_u32plus d) {
+	OUT(&hash[0], a)
+	OUT(&hash[4], b)
+	OUT(&hash[8], c)
+	OUT(&hash[12], d)
+}
+
+md5_hash::md5_hash(unsigned char data[16]) {
+	for (int i = 0; i < 16; i++) {
+		hash[i] = data[i];
+	}
+}
 
 /*
  * This processes one or more 64-byte data blocks, but does NOT update the bit
  * counters.  There are no alignment requirements.
  */
-static const void *body(MD5_CTX *ctx, const void *data, unsigned long size)
+void* md5_builder::body(const void *data, unsigned long size)
 {
 	const unsigned char *ptr;
 	MD5_u32plus a, b, c, d;
@@ -105,10 +128,10 @@ static const void *body(MD5_CTX *ctx, const void *data, unsigned long size)
 
 	ptr = (const unsigned char *)data;
 
-	a = ctx->a;
-	b = ctx->b;
-	c = ctx->c;
-	d = ctx->d;
+	a = ctx.a;
+	b = ctx.b;
+	c = ctx.c;
+	d = ctx.d;
 
 	do {
 		saved_a = a;
@@ -196,34 +219,33 @@ static const void *body(MD5_CTX *ctx, const void *data, unsigned long size)
 		ptr += 64;
 	} while (size -= 64);
 
-	ctx->a = a;
-	ctx->b = b;
-	ctx->c = c;
-	ctx->d = d;
+	ctx.a = a;
+	ctx.b = b;
+	ctx.c = c;
+	ctx.d = d;
 
-	return ptr;
+	return (void*)ptr;
 }
 
-void MD5_Init(MD5_CTX *ctx)
-{
-	ctx->a = 0x67452301;
-	ctx->b = 0xefcdab89;
-	ctx->c = 0x98badcfe;
-	ctx->d = 0x10325476;
-
-	ctx->lo = 0;
-	ctx->hi = 0;
+md5_builder::md5_builder() {
+	ctx.a = 0x67452301;
+	ctx.b = 0xefcdab89;
+	ctx.c = 0x98badcfe;
+	ctx.d = 0x10325476;
+		 
+	ctx.lo = 0;
+	ctx.hi = 0;
 }
 
-void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size)
+void md5_builder::update(const void *data, unsigned long size)
 {
 	MD5_u32plus saved_lo;
 	unsigned long used, available;
 
-	saved_lo = ctx->lo;
-	if ((ctx->lo = (saved_lo + size) & 0x1fffffff) < saved_lo)
-		ctx->hi++;
-	ctx->hi += size >> 29;
+	saved_lo = ctx.lo;
+	if ((ctx.lo = (saved_lo + size) & 0x1fffffff) < saved_lo)
+		ctx.hi++;
+	ctx.hi += size >> 29;
 
 	used = saved_lo & 0x3f;
 
@@ -231,61 +253,74 @@ void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size)
 		available = 64 - used;
 
 		if (size < available) {
-			memcpy(&ctx->buffer[used], data, size);
+			memcpy(&ctx.buffer[used], data, size);
 			return;
 		}
 
-		memcpy(&ctx->buffer[used], data, available);
+		memcpy(&ctx.buffer[used], data, available);
 		data = (const unsigned char *)data + available;
 		size -= available;
-		body(ctx, ctx->buffer, 64);
+		body(ctx.buffer, 64);
 	}
 
 	if (size >= 64) {
-		data = body(ctx, data, size & ~(unsigned long)0x3f);
+		data = body(data, size & ~(unsigned long)0x3f);
 		size &= 0x3f;
 	}
 
-	memcpy(ctx->buffer, data, size);
+	memcpy(ctx.buffer, data, size);
 }
 
-#define OUT(dst, src) \
-	(dst)[0] = (unsigned char)(src); \
-	(dst)[1] = (unsigned char)((src) >> 8); \
-	(dst)[2] = (unsigned char)((src) >> 16); \
-	(dst)[3] = (unsigned char)((src) >> 24);
-
-void MD5_Final(unsigned char *result, MD5_CTX *ctx)
+md5_hash md5_builder::finalize()
 {
 	unsigned long used, available;
 
-	used = ctx->lo & 0x3f;
+	used = ctx.lo & 0x3f;
 
-	ctx->buffer[used++] = 0x80;
+	ctx.buffer[used++] = 0x80;
 
 	available = 64 - used;
 
 	if (available < 8) {
-		memset(&ctx->buffer[used], 0, available);
-		body(ctx, ctx->buffer, 64);
+		memset(&ctx.buffer[used], 0, available);
+		body(ctx.buffer, 64);
 		used = 0;
 		available = 64;
 	}
 
-	memset(&ctx->buffer[used], 0, available - 8);
+	memset(&ctx.buffer[used], 0, available - 8);
 
-	ctx->lo <<= 3;
-	OUT(&ctx->buffer[56], ctx->lo)
-	OUT(&ctx->buffer[60], ctx->hi)
+	ctx.lo <<= 3;
+	OUT(&ctx.buffer[56], ctx.lo)
+	OUT(&ctx.buffer[60], ctx.hi)
 
-	body(ctx, ctx->buffer, 64);
+	body(ctx.buffer, 64);
 
-	OUT(&result[0], ctx->a)
-	OUT(&result[4], ctx->b)
-	OUT(&result[8], ctx->c)
-	OUT(&result[12], ctx->d)
+  md5_hash result(ctx.a, ctx.b, ctx.c, ctx.d);
 
-	memset(ctx, 0, sizeof(*ctx));
+	memset(&ctx, 0, sizeof(ctx));
+  return result;
+}
+
+std::string md5_hash::to_string() const {
+	std::stringstream ss;
+	ss << std::hex << std::setfill('0');
+	for (int i = 0; i < 16; i++)
+		ss << std::setw(2) << static_cast<int>(this->hash[i]);
+	return ss.str();
+}
+
+md5_hash md5_hash::from_string(const std::string& str) {
+  if (str.length() != 32) {
+    throw std::invalid_argument("MD5 string must be 32 characters long.");
+  }
+
+	unsigned char char_hash[16] = {};
+	for (int i = 0; i < 16; i++) {
+    std::string byteString = str.substr(i*2, 2);
+    char_hash[i] = std::stoul(byteString, nullptr, 16);
+	}
+	return char_hash;
 }
 
 #endif

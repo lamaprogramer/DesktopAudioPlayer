@@ -5,20 +5,22 @@
 #include <string>
 #include <vector>
 
+#include "md5.h"
+
 namespace iamaprogrammer {
   class Playlist {
   public:
     Playlist();
     Playlist(std::string name);
 
-    void add(std::string name);
-    void remove(const std::string &name);
+    void add(md5_hash fileHash);
+    void remove(const md5_hash fileHash);
 
     static Playlist load(std::filesystem::path filePath);
   private:
     std::string name;
-    std::vector<std::string> audio;
+    std::vector<md5_hash> audio;
 
-    Playlist(std::vector<std::string> audio, std::string name);
+    Playlist(std::vector<md5_hash> audio, std::string name);
   };
 }

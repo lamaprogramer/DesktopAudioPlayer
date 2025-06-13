@@ -10,17 +10,17 @@ namespace iamaprogrammer {
     this->name = name;
   }
 
-  Playlist::Playlist(std::vector<std::string> audio, std::string name) {
+  Playlist::Playlist(std::vector<md5_hash> audio, std::string name) {
     this->audio = audio;
     this->name = name;
   }
 
-  void Playlist::add(std::string name) {
-    this->audio.push_back(name);
+  void Playlist::add(md5_hash fileHash) {
+    this->audio.push_back(fileHash);
   }
 
-  void Playlist::remove(const std::string& name) {
-    this->audio.erase(std::find(this->audio.begin(), this->audio.end(), name));
+  void Playlist::remove(const md5_hash fileHash) {
+    this->audio.erase(std::find(this->audio.begin(), this->audio.end(), fileHash));
   }
 
   Playlist Playlist::load(std::filesystem::path filePath) {
@@ -41,7 +41,7 @@ namespace iamaprogrammer {
 
     // Read the playlist file
     std::ifstream file(filePath);
-    std::vector<std::string> audioFiles;
+    std::vector<md5_hash> audioFiles;
 
     if (file.is_open()) {
       std::string line;
@@ -50,7 +50,7 @@ namespace iamaprogrammer {
       while (std::getline(file, line)) {
         if (line.empty()) continue; // Skip empty lines
 
-        audioFiles.push_back(line);
+        //audioFiles.push_back(line);
         readLines++;
       }
       file.close();

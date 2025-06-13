@@ -19,13 +19,13 @@ add_executable(${PROJECT_NAME}
   "src/source/api/AudioManager.cpp"
   "src/source/api/Playlist.cpp"  
   "src/source/api/AudioChunk.cpp" 
-  "src/source/api/AudioRegistry.cpp"
+  "src/source/registry/AudioRegistry.cpp"
 
 	"src/source/app/AppFileInterface.cpp"
   "src/source/app/App.cpp"
   "src/source/app/elements/AudioController.cpp"
   "src/source/crypt/md5.cpp"
-) # Define executable files
+ "src/headers/registry/PlaylistRegistry.h" "src/headers/registry/Registry.h" "src/source/registry/PlaylistRegistry.cpp") # Define executable files
 
 target_include_directories(${PROJECT_NAME}
   PRIVATE ${CMAKE_SOURCE_DIR}/libs/portaudio/include
@@ -47,6 +47,7 @@ target_include_directories(${PROJECT_NAME}
   PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/app/elements
 
   PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/crypt
+  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/registry
 ) # Include header files
 
 target_link_directories(${PROJECT_NAME} 
