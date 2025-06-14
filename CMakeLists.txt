@@ -11,21 +11,26 @@ find_package(OpenGL REQUIRED)
 
 add_subdirectory(libs/glfw-3.4)
 add_subdirectory(libs/RmlUi/Backends)
+add_subdirectory(libs/Catch2)
+
+add_subdirectory("test")
+add_subdirectory("src")
 
 add_executable(${PROJECT_NAME}
 	"src/main.cpp"
-	"src/source/api/AudioStream.cpp"
-	"src/source/api/SoundFileIO.cpp"
+	"src/source/audio/AudioStream.cpp"
+	"src/source/audio/SoundFileIO.cpp"
   "src/source/api/AudioManager.cpp"
   "src/source/api/Playlist.cpp"  
-  "src/source/api/AudioChunk.cpp" 
+  "src/source/audio/AudioChunk.cpp" 
   "src/source/registry/AudioRegistry.cpp"
 
 	"src/source/app/AppFileInterface.cpp"
   "src/source/app/App.cpp"
   "src/source/app/elements/AudioController.cpp"
   "src/source/crypt/md5.cpp"
- "src/headers/registry/PlaylistRegistry.h" "src/headers/registry/Registry.h" "src/source/registry/PlaylistRegistry.cpp") # Define executable files
+  "src/source/registry/PlaylistRegistry.cpp") # Define executable files
+
 
 target_include_directories(${PROJECT_NAME}
   PRIVATE ${CMAKE_SOURCE_DIR}/libs/portaudio/include

@@ -3,8 +3,9 @@
 #include <map>
 #include <vector>
 
+#include <audio/AudioStream.h>
 #include "Playlist.h"
-#include "AudioStream.h"
+
 
 namespace iamaprogrammer {
   class AudioManager {

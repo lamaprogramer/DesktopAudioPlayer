@@ -55,6 +55,10 @@ public:
     return this->to_string() == hash1.to_string();
 	}
 
+  bool operator!=(const md5_hash& hash1) const {
+    return this->to_string() != hash1.to_string();
+  }
+
   bool operator<(const md5_hash &hash1) const {
     return this->to_string() < hash1.to_string();
   }

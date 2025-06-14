@@ -12,15 +12,15 @@
 #include <RmlUi/Debugger.h>
 #include <RmlUi_Backend.h>
 
-#include "SoundFileIO.h"
-#include "AudioData.h"
-#include "AudioStream.h"
+#include <crypt/md5.h>
+#include <audio/AudioData.h>
+#include <audio/AudioStream.h>
+#include <audio/SoundFileIO.h>
+
 #include "AudioRegistry.h"
 #include "Playlist.h"
 
 #include "App.h"
-
-#include "md5.h"
 
 bool processKeyDownShortcuts(Rml::Context* context, Rml::Input::KeyIdentifier key, int key_modifier, float native_dp_ratio, bool priority);
 

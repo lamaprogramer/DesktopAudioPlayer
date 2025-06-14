@@ -5,7 +5,7 @@
 #include <RmlUi/Core/EventListener.h>
 #include <RmlUi/Core/Element.h>
 
-#include "AudioStream.h"
+#include <audio/AudioStream.h>
 
 class AudioController : public Rml::Element, public Rml::EventListener {
 public:

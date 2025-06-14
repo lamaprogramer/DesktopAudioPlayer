@@ -1,5 +1,7 @@
-#include "AudioStream.h"
-#include "SoundFileIO.h"
+//#include "AudioStream.h"
+//#include "SoundFileIO.h"
+#include "../../headers/audio/AudioStream.h"
+#include "../../headers/audio/SoundFileIO.h"
 
 #include <string>
 

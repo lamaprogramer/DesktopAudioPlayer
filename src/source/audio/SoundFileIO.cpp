@@ -1,4 +1,6 @@
-#include "SoundFileIO.h"
+//#include "SoundFileIO.h"
+//#include <audio/SoundFileIO.h>
+#include "../../headers/audio/SoundFileIO.h"
 
 #include <iostream>
 #include <sndfile.h>
