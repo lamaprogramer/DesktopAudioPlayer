@@ -47,24 +47,51 @@ class md5_hash {
 public:
   md5_hash(MD5_u32plus a, MD5_u32plus b, MD5_u32plus c, MD5_u32plus d);
 
+  md5_hash(const unsigned char data[16]);
+
   unsigned char operator[](int index) const {
     return hash[index];
   }
 
 	bool operator==(const md5_hash &hash1) const {
-    return this->to_string() == hash1.to_string();
+    for (int i = 0; i < 16; i++) {
+      if (hash[i] != hash1.hash[i]) {
+        return false;
+      }
+    }
+    return true;
 	}
 
   bool operator!=(const md5_hash& hash1) const {
-    return this->to_string() != hash1.to_string();
+    for (int i = 0; i < 16; i++) {
+      if (hash[i] == hash1.hash[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   bool operator<(const md5_hash &hash1) const {
-    return this->to_string() < hash1.to_string();
+    for (int i = 0; i < 16; i++) {
+      if (hash[i] < hash1.hash[i]) {
+        return true;
+      } else if (hash[i] > hash1.hash[i]) {
+        return false;
+      }
+    }
+    return false;
   }
 
   bool operator>(const md5_hash &hash1) const {
-    return this->to_string() > hash1.to_string();
+    for (int i = 0; i < 16; i++) {
+      if (hash[i] > hash1.hash[i]) {
+        return true;
+      }
+      else if (hash[i] < hash1.hash[i]) {
+        return false;
+      }
+    }
+    return false;
   }
 
   md5_hash operator=(const unsigned char data[16]) {
@@ -83,8 +110,6 @@ public:
 
 private:
 	unsigned char hash[16];
-
-  md5_hash(unsigned char data[16]);
 };
 
 

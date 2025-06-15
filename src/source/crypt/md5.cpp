@@ -110,7 +110,7 @@ md5_hash::md5_hash(MD5_u32plus a, MD5_u32plus b, MD5_u32plus c, MD5_u32plus d) {
 	OUT(&hash[12], d)
 }
 
-md5_hash::md5_hash(unsigned char data[16]) {
+md5_hash::md5_hash(const unsigned char data[16]) {
 	for (int i = 0; i < 16; i++) {
 		hash[i] = data[i];
 	}
