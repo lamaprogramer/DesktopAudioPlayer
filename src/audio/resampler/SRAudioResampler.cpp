@@ -1,14 +1,16 @@
 #include "../../../include/audio/resampler/SRAudioResampler.h"
 
 namespace iamaprogrammer {
-  SRAudioResampler::SRAudioResampler(void* readBuffer, double sampleRateConversionRatio, int channels, int readSize):
-    sampleRateConversionRatio(sampleRateConversionRatio)
-  {
-    this->srcState = src_new(SRC_SINC_FASTEST, channels, &this->error);
-    this->srcData.data_in = (float*)readBuffer;
+  SRAudioResampler::SRAudioResampler(IAudioReader* reader, double deviceSampleRate, int readSize) {
+
+    AudioFileDescriptor* fileDescriptor = reader->getAudioFileDescriptor();
+    this->sampleRateConversionRatio = deviceSampleRate / fileDescriptor->sampleRate;
+
+    this->srcState = src_new(SRC_SINC_FASTEST, fileDescriptor->channels, &this->error);
+    this->srcData.data_in = (float*)reader->getReadBuffer();
     this->srcData.input_frames = readSize;
-    this->srcData.output_frames = readSize * sampleRateConversionRatio;
-    this->srcData.src_ratio = sampleRateConversionRatio;
+    this->srcData.output_frames = readSize * this->sampleRateConversionRatio;
+    this->srcData.src_ratio = this->sampleRateConversionRatio;
     this->srcData.end_of_input = 0;
   }
 

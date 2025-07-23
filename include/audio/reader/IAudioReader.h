@@ -8,7 +8,7 @@
 namespace iamaprogrammer {
   class IAudioReader {
   public:
-    virtual size_t read(IAudioResampler* resampler, std::queue<AudioChunk>& buffer) = 0;
+    virtual size_t read(IAudioResampler* resampler, AudioBuffer& buffer) = 0;
     virtual void seek(size_t frames, int whence) = 0;
     virtual void* getReadBuffer() = 0;
 

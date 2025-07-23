@@ -5,10 +5,8 @@
 #include "../resampler/IAudioResampler.h"
 
 namespace iamaprogrammer {
-  typedef std::queue<iamaprogrammer::AudioChunk> AudioBuffer;
-
   struct AudioStreamData {
-    iamaprogrammer::AudioFileDescriptor* data;
+    AudioFileDescriptor* data;
     AudioBuffer* buffer;
 
     bool seeking = false;

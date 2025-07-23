@@ -26,7 +26,7 @@ namespace iamaprogrammer {
     this->readBuffer = std::vector<float>(readSize * info.channels);
   }
 
-  size_t SndlibAudioReader::read(IAudioResampler* resampler, std::queue<AudioChunk>& buffer) {
+  size_t SndlibAudioReader::read(IAudioResampler* resampler, AudioBuffer& buffer) {
     int srConvertionRatio = resampler->getSampleRateConversionRatio();
     AudioChunk chunk((this->readSize * srConvertionRatio) * this->audioFileDescriptor.channels);
 
@@ -39,9 +39,6 @@ namespace iamaprogrammer {
     }
 
     if (readCount > 0) {
-      /*if (readCount < bufferSize) {
-        buffer.resize(readCount*this->data.channels);
-      }*/
       buffer.push(chunk);
     }
     return readCount;
@@ -60,6 +57,6 @@ namespace iamaprogrammer {
   }
 
   void SndlibAudioReader::close() {
-
+    sf_close(file);
   }
 }

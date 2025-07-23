@@ -1,6 +1,6 @@
 add_library(audio STATIC
   "AudioStream.cpp"
-  "SoundFileIO.cpp"
+  
   "AudioChunk.cpp"
   "stream/PortAudioStream.cpp" 
   "backends/PortAudioBackend.cpp" 

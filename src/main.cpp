@@ -15,7 +15,6 @@
 #include <crypt/md5.h>
 #include <audio/AudioFileDescriptor.h>
 #include <audio/AudioStream.h>
-#include <audio/SoundFileIO.h>
 #include <audio/resampler/SRAudioResampler.h>
 #include <audio/reader/SndlibAudioReader.h>
 #include <audio/stream/PortAudioStream.h>
@@ -43,36 +42,13 @@ int main(int argc, char* argv[]) {
     std::cout << entry.first.to_string() << std::endl;
   }
 
-  //iamaprogrammer::AudioRegistry::MDPrint(hash);
-  //65a8e27d8879283831b664bd8b7fad4
-  //65a8e27d8879283831b664bd8b7f0ad4
-  /*MD5_CTX md5Context;
-  unsigned char result[16];
-
-  MD5_Init(&md5Context);
-  MD5_Update(&md5Context, "Hello, World!", 13);
-  MD5_Final(result, &md5Context);
-
-  MDPrint(result);*/
-	
-  //iamaprogrammer::Playlist playlist = iamaprogrammer::Playlist::load("resources/playlists/test.txt");
-
   iamaprogrammer::PortAudioBackend backend;
   backend.initialize();
 
-  iamaprogrammer::SndlibAudioReader reader(
-    std::filesystem::current_path() / "resources\\library\\01 Spiritfarer.mp3",
-    1024
-  );
-
-  iamaprogrammer::SRAudioResampler resampler(
-    reader.getReadBuffer(), 
-    backend.getDefaultAudioDevice().samplerate / reader.getAudioFileDescriptor()->sampleRate,
-    reader.getAudioFileDescriptor()->channels,
-    1024
-  );
-
+  iamaprogrammer::SndlibAudioReader reader(std::filesystem::current_path() / "resources" / "library" / "01 Spiritfarer.mp3", 1024);
+  iamaprogrammer::SRAudioResampler resampler(&reader, backend.getDefaultAudioDevice().samplerate, 1024);
   iamaprogrammer::PortAudioStream basicStream = iamaprogrammer::PortAudioStream();
+
   iamaprogrammer::AudioStream advancedStream = iamaprogrammer::AudioStream(&reader, &resampler, &basicStream);
 
   advancedStream.setup();

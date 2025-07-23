@@ -11,7 +11,7 @@ namespace iamaprogrammer {
     SndlibAudioReader();
     SndlibAudioReader(std::filesystem::path filePath, int readSize);
 
-    size_t read(IAudioResampler* resampler, std::queue<AudioChunk>& buffer) override;
+    size_t read(IAudioResampler* resampler, AudioBuffer& buffer) override;
     void seek(size_t frames, int whence) override;
     void* getReadBuffer() override;
 

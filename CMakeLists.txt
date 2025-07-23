@@ -19,7 +19,7 @@ add_subdirectory("src")
 add_executable(${PROJECT_NAME}
 	"src/main.cpp"
 	"src/audio/AudioStream.cpp"
-	"src/audio/SoundFileIO.cpp"
+	
   "src/api/AudioManager.cpp"
   "src/api/Playlist.cpp"  
   "src/audio/AudioChunk.cpp" 

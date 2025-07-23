@@ -1,11 +1,12 @@
 #pragma once
 #include "IAudioResampler.h"
+#include "../reader/IAudioReader.h"
 #include <samplerate.h>
 
 namespace iamaprogrammer {
   class SRAudioResampler: public IAudioResampler {
   public:
-    SRAudioResampler(void* readBuffer, double sampleRateConversionRatio, int channels, int readSize);
+    SRAudioResampler(IAudioReader* reader, double deviceSampleRate, int readSize);
 
     void resample(void* writeBuffer) override;
     double getSampleRateConversionRatio() override;
