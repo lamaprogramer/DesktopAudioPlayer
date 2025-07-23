@@ -23,6 +23,23 @@ namespace iamaprogrammer {
     this->audio.erase(std::find(this->audio.begin(), this->audio.end(), fileHash));
   }
 
+  void Playlist::save(std::filesystem::path filePath) const {
+    if (!std::filesystem::exists(filePath)) {
+      std::cout << "Playlist file does not exist. Creating new playlist." << std::endl;
+      std::filesystem::create_directories(filePath.parent_path());
+
+      std::ofstream file(filePath);
+      if (file.is_open()) {
+        file << this->name << std::endl; // Write the playlist name
+        for (const auto& audioFile : this->audio) {
+          file << audioFile.to_string() << std::endl; // Write each audio file hash
+        }
+
+        file.close();
+      }
+    }
+  }
+
   Playlist Playlist::load(std::filesystem::path filePath) {
     std::filesystem::path filename = filePath.filename().stem();
     //std::cout << this->playlistDir / filename << std::endl;
@@ -50,7 +67,14 @@ namespace iamaprogrammer {
       while (std::getline(file, line)) {
         if (line.empty()) continue; // Skip empty lines
 
-        //audioFiles.push_back(line);
+        if (readLines == 0) {
+          filename = line;
+          continue;
+        } else {
+          md5_hash fileHash = md5_hash::from_string(line);
+          audioFiles.push_back(fileHash);
+        }
+
         readLines++;
       }
       file.close();

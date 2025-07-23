@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AudioData.h"
+#include "AudioFileDescriptor.h"
 #include <filesystem>
 #include <vector>
 #include <queue>
@@ -21,7 +21,7 @@ namespace iamaprogrammer {
       size_t read(std::queue<AudioChunk>& buffer);
       void seek(size_t frames, int whence);
 
-      AudioData* getAudioData();
+      AudioFileDescriptor* getAudioData();
       double getSampleRateRatio();
 
       void close();
@@ -32,17 +32,12 @@ namespace iamaprogrammer {
       SRC_STATE* srcState; // Samplerate Converter state
       SRC_DATA srcData; // Samplerate Converter data
 
-      AudioData data;
+      AudioFileDescriptor data;
       std::vector<float> readBuffer;
 
       int error = 0;
       int readSize = 0;
       int deviceSampleRate = 0;
-  };
-
-  class AudioWriter {
-    public:
-      AudioWriter(std::filesystem::path filePath);
   };
 
   static std::string toString(float* buf, int size) {

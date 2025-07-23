@@ -18,18 +18,22 @@ add_subdirectory("src")
 
 add_executable(${PROJECT_NAME}
 	"src/main.cpp"
-	"src/source/audio/AudioStream.cpp"
-	"src/source/audio/SoundFileIO.cpp"
-  "src/source/api/AudioManager.cpp"
-  "src/source/api/Playlist.cpp"  
-  "src/source/audio/AudioChunk.cpp" 
-  "src/source/registry/AudioRegistry.cpp"
+	"src/audio/AudioStream.cpp"
+	"src/audio/SoundFileIO.cpp"
+  "src/api/AudioManager.cpp"
+  "src/api/Playlist.cpp"  
+  "src/audio/AudioChunk.cpp" 
+  "src/registry/AudioRegistry.cpp"
 
-	"src/source/app/AppFileInterface.cpp"
-  "src/source/app/App.cpp"
-  "src/source/app/elements/AudioController.cpp"
-  "src/source/crypt/md5.cpp"
-  "src/source/registry/PlaylistRegistry.cpp") # Define executable files
+	"src/app/AppFileInterface.cpp"
+  "src/app/App.cpp"
+  "src/app/elements/AudioController.cpp"
+  "src/crypt/md5.cpp"
+  "src/registry/PlaylistRegistry.cpp" 
+  "src/audio/stream/PortAudioStream.cpp" 
+  "src/audio/backends/PortAudioBackend.cpp" 
+  "src/audio/resampler/SRAudioResampler.cpp" 
+  "src/audio/reader/SndlibAudioReader.cpp") # Define executable files
 
 
 target_include_directories(${PROJECT_NAME}
@@ -43,16 +47,16 @@ target_include_directories(${PROJECT_NAME}
   PRIVATE ${CMAKE_SOURCE_DIR}/libs/RmlUi/Include
   #PRIVATE ${CMAKE_SOURCE_DIR}/libs/lunasvg/include
 
-  PRIVATE ${CMAKE_SOURCE_DIR}/src
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/api
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/api/buffers
+  PRIVATE ${CMAKE_SOURCE_DIR}/include
+  PRIVATE ${CMAKE_SOURCE_DIR}/include
+  PRIVATE ${CMAKE_SOURCE_DIR}/include/api
+  PRIVATE ${CMAKE_SOURCE_DIR}/include/api/buffers
 
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/app
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/app/elements
+  PRIVATE ${CMAKE_SOURCE_DIR}/include/app
+  PRIVATE ${CMAKE_SOURCE_DIR}/include/app/elements
 
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/crypt
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/headers/registry
+  PRIVATE ${CMAKE_SOURCE_DIR}/include/crypt
+  PRIVATE ${CMAKE_SOURCE_DIR}/include/registry
 ) # Include header files
 
 target_link_directories(${PROJECT_NAME} 

@@ -1,5 +1,5 @@
 //#include "AudioChunk.h"
-#include "../../headers/audio/AudioChunk.h"
+#include "../../include/audio/AudioChunk.h"
 
 namespace iamaprogrammer {
 

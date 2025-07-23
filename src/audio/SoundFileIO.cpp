@@ -1,6 +1,6 @@
 //#include "SoundFileIO.h"
 //#include <audio/SoundFileIO.h>
-#include "../../headers/audio/SoundFileIO.h"
+#include "../../include/audio/SoundFileIO.h"
 
 #include <iostream>
 #include <sndfile.h>
@@ -64,7 +64,7 @@ namespace iamaprogrammer {
     sf_seek(this->file, frames, whence);
   }
 
-  AudioData* AudioReader::getAudioData() {
+  AudioFileDescriptor* AudioReader::getAudioData() {
     return &this->data;
   }
 

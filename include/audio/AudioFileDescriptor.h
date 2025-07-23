@@ -3,7 +3,7 @@
 #include <vector>
 
 namespace iamaprogrammer {
-  struct AudioData {
+  struct AudioFileDescriptor {
     size_t frames;
     int sampleRate;
     int channels;

@@ -114,7 +114,7 @@ void AudioController::OnResize() {
 
 void AudioController::OnAttributeChange(const Rml::ElementAttributes& changed_attributes) {
   if (changed_attributes.find("src") != changed_attributes.end()) {
-    this->stream = new iamaprogrammer::AudioStream(this->GetAttribute<std::string>("src", ""));
+    //this->stream = new iamaprogrammer::AudioStream(this->GetAttribute<std::string>("src", ""));
     std::cout << "set src" << std::endl;
   }
 }

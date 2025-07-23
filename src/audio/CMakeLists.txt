@@ -2,8 +2,13 @@ add_library(audio STATIC
   "AudioStream.cpp"
   "SoundFileIO.cpp"
   "AudioChunk.cpp"
-)
-target_include_directories(audio PUBLIC ${CMAKE_SOURCE_DIR}/src/headers/audio)
+  "stream/PortAudioStream.cpp" 
+  "backends/PortAudioBackend.cpp" 
+  "resampler/SRAudioResampler.cpp" 
+  "reader/SndlibAudioReader.cpp")
+
+target_include_directories(audio PUBLIC ${CMAKE_SOURCE_DIR}/include/audio)
+#target_include_directories(audio PUBLIC ${CMAKE_SOURCE_DIR}/include/audio/stream)
 
 target_include_directories(audio
   PRIVATE ${CMAKE_SOURCE_DIR}/libs/portaudio/include

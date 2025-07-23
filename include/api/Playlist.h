@@ -16,11 +16,14 @@ namespace iamaprogrammer {
     void add(md5_hash fileHash);
     void remove(const md5_hash fileHash);
 
+    void save(std::filesystem::path filepath) const;
     static Playlist load(std::filesystem::path filePath);
   private:
     std::string name;
     std::vector<md5_hash> audio;
 
     Playlist(std::vector<md5_hash> audio, std::string name);
+
+
   };
 }

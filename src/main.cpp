@@ -13,9 +13,13 @@
 #include <RmlUi_Backend.h>
 
 #include <crypt/md5.h>
-#include <audio/AudioData.h>
+#include <audio/AudioFileDescriptor.h>
 #include <audio/AudioStream.h>
 #include <audio/SoundFileIO.h>
+#include <audio/resampler/SRAudioResampler.h>
+#include <audio/reader/SndlibAudioReader.h>
+#include <audio/stream/PortAudioStream.h>
+#include <audio/backends/PortAudioBackend.h>
 
 #include "AudioRegistry.h"
 #include "Playlist.h"
@@ -39,19 +43,6 @@ int main(int argc, char* argv[]) {
     std::cout << entry.first.to_string() << std::endl;
   }
 
-
-  md5_builder builder;
-  builder.update("Hello, World!", 13);
-  md5_hash hash = builder.finalize();
-
-  std::string str_hash = hash.to_string();
-
-  std::cout << "Hash1: " << str_hash << std::endl;
-
-  md5_hash hash2 = md5_hash::from_string(str_hash);
-
-  std::cout << "Hash2: " << hash2.to_string() << std::endl;
-
   //iamaprogrammer::AudioRegistry::MDPrint(hash);
   //65a8e27d8879283831b664bd8b7fad4
   //65a8e27d8879283831b664bd8b7f0ad4
@@ -66,23 +57,36 @@ int main(int argc, char* argv[]) {
 	
   //iamaprogrammer::Playlist playlist = iamaprogrammer::Playlist::load("resources/playlists/test.txt");
 
-	
+  iamaprogrammer::PortAudioBackend backend;
+  backend.initialize();
 
-  /*PaError err;
-  err = Pa_Initialize();
-  if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;
+  iamaprogrammer::SndlibAudioReader reader(
+    std::filesystem::current_path() / "resources\\library\\01 Spiritfarer.mp3",
+    1024
+  );
 
-  iamaprogrammer::AudioStream audio = iamaprogrammer::AudioStream(std::filesystem::current_path() / "resources\\library\\01 Spiritfarer.mp3");
-  audio.setup();
-  audio.start();
+  iamaprogrammer::SRAudioResampler resampler(
+    reader.getReadBuffer(), 
+    backend.getDefaultAudioDevice().samplerate / reader.getAudioFileDescriptor()->sampleRate,
+    reader.getAudioFileDescriptor()->channels,
+    1024
+  );
+
+  iamaprogrammer::PortAudioStream basicStream = iamaprogrammer::PortAudioStream();
+  iamaprogrammer::AudioStream advancedStream = iamaprogrammer::AudioStream(&reader, &resampler, &basicStream);
+
+  advancedStream.setup();
+  advancedStream.start();
   Pa_Sleep(10000);
-  audio.seek(-3);
+  advancedStream.seek(-3);
   Pa_Sleep(10000);
-  audio.stop();
-  audio.end();
+  advancedStream.stop();
+  advancedStream.end();
 
-	err = Pa_Terminate();
-	if (err != paNoError) std::cout << Pa_GetErrorText(err) << std::endl;*/
+  reader.close();
+  resampler.close();
+  backend.terminate();
+
 
 
   /*App app = App(1080, 540);

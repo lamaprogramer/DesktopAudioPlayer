@@ -1,2 +1,2 @@
-add_subdirectory("source/audio")
-add_subdirectory("source/crypt")
+add_subdirectory("audio")
+add_subdirectory("crypt")
