@@ -2,7 +2,7 @@
 # and include sub-projects here.
 #
 cmake_minimum_required (VERSION 3.8)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 project ("VibeTunes")
 
@@ -33,7 +33,10 @@ add_executable(${PROJECT_NAME}
   "src/audio/stream/PortAudioStream.cpp" 
   "src/audio/backends/PortAudioBackend.cpp" 
   "src/audio/resampler/SRAudioResampler.cpp" 
-  "src/audio/reader/SndlibAudioReader.cpp") # Define executable files
+  "src/audio/reader/SndlibAudioReader.cpp" 
+  "src/logger/Logger.cpp" 
+  "src/logger/Colors.cpp" 
+  "src/logger/LogInfoComponents.cpp") # Define executable files
 
 
 target_include_directories(${PROJECT_NAME}

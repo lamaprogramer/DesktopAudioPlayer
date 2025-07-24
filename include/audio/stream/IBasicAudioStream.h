@@ -16,7 +16,7 @@ namespace iamaprogrammer {
 
   class IBasicAudioStream {
   public:
-    virtual void openStream(IAudioReader* reader, IAudioResampler* resampler, int chunkSize) = 0;
+    virtual void openStream(IAudioReader* reader, IAudioResampler* resampler) = 0;
     virtual void closeStream() = 0;
 
     virtual void startStream() = 0;

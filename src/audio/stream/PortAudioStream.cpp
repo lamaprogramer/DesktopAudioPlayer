@@ -5,7 +5,7 @@ namespace iamaprogrammer {
   PortAudioStream::PortAudioStream() {
   }
 
-  void PortAudioStream::openStream(IAudioReader* reader, IAudioResampler* resampler, int chunkSize) {
+  void PortAudioStream::openStream(IAudioReader* reader, IAudioResampler* resampler) {
 
     this->audioStreamData = AudioStreamData{
       reader->getAudioFileDescriptor(),
@@ -27,7 +27,7 @@ namespace iamaprogrammer {
       NULL,
       &outputParameters,
       deviceInfo->defaultSampleRate,
-      chunkSize * resampler->getSampleRateConversionRatio(), // paFramesPerBufferUnspecified
+      reader->getReadSize() * resampler->getSampleRateConversionRatio(), // paFramesPerBufferUnspecified
       paNoFlag,
       paCallback,
       &this->audioStreamData

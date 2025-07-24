@@ -3,7 +3,6 @@
 #include <string>
 
 namespace iamaprogrammer {
-  int AudioStream::READ_SIZE = 1024;
   int AudioStream::MAX_LOADED_CHUNKS = 10;
 
   AudioStream::AudioStream() {};
@@ -26,8 +25,7 @@ namespace iamaprogrammer {
 
     this->basicAudioStream->openStream(
       this->reader, 
-      this->resampler,
-      READ_SIZE
+      this->resampler
     );
     this->handleError();
   }

@@ -12,7 +12,7 @@ namespace iamaprogrammer {
   public:
     PortAudioStream();
 
-    void openStream(IAudioReader* reader, IAudioResampler* resampler, int chunkSize) override;
+    void openStream(IAudioReader* reader, IAudioResampler* resampler) override;
     void closeStream() override;
 
     void startStream() override;

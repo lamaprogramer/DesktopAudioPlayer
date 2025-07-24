@@ -46,7 +46,6 @@ namespace iamaprogrammer {
       StreamState getStreamState();
 
     private:
-      static int READ_SIZE;
       static int MAX_LOADED_CHUNKS;
       
       // Essential

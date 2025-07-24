@@ -56,6 +56,10 @@ namespace iamaprogrammer {
     return &this->audioFileDescriptor;
   }
 
+  int SndlibAudioReader::getReadSize() {
+    return this->readSize;
+  }
+
   void SndlibAudioReader::close() {
     sf_close(file);
   }

@@ -6,7 +6,7 @@
 namespace iamaprogrammer {
   class SRAudioResampler: public IAudioResampler {
   public:
-    SRAudioResampler(IAudioReader* reader, double deviceSampleRate, int readSize);
+    SRAudioResampler(IAudioReader* reader, double deviceSampleRate);
 
     void resample(void* writeBuffer) override;
     double getSampleRateConversionRatio() override;

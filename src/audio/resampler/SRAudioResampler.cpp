@@ -1,9 +1,10 @@
 #include "../../../include/audio/resampler/SRAudioResampler.h"
 
 namespace iamaprogrammer {
-  SRAudioResampler::SRAudioResampler(IAudioReader* reader, double deviceSampleRate, int readSize) {
+  SRAudioResampler::SRAudioResampler(IAudioReader* reader, double deviceSampleRate) {
 
     AudioFileDescriptor* fileDescriptor = reader->getAudioFileDescriptor();
+    int readSize = reader->getReadSize();
     this->sampleRateConversionRatio = deviceSampleRate / fileDescriptor->sampleRate;
 
     this->srcState = src_new(SRC_SINC_FASTEST, fileDescriptor->channels, &this->error);

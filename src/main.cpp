@@ -20,6 +20,9 @@
 #include <audio/stream/PortAudioStream.h>
 #include <audio/backends/PortAudioBackend.h>
 
+#include <logger/Logger.h>
+#include <logger/Colors.h>
+
 #include "AudioRegistry.h"
 #include "Playlist.h"
 
@@ -42,11 +45,15 @@ int main(int argc, char* argv[]) {
     std::cout << entry.first.to_string() << std::endl;
   }
 
-  iamaprogrammer::PortAudioBackend backend;
+  iamaprogrammer::Logger::info("Testing logging system");
+  iamaprogrammer::Logger::warn("Testing logging system");
+  iamaprogrammer::Logger::error("Testing logging system");
+
+  /*iamaprogrammer::PortAudioBackend backend;
   backend.initialize();
 
   iamaprogrammer::SndlibAudioReader reader(std::filesystem::current_path() / "resources" / "library" / "01 Spiritfarer.mp3", 1024);
-  iamaprogrammer::SRAudioResampler resampler(&reader, backend.getDefaultAudioDevice().samplerate, 1024);
+  iamaprogrammer::SRAudioResampler resampler(&reader, backend.getDefaultAudioDevice().samplerate);
   iamaprogrammer::PortAudioStream basicStream = iamaprogrammer::PortAudioStream();
 
   iamaprogrammer::AudioStream advancedStream = iamaprogrammer::AudioStream(&reader, &resampler, &basicStream);
@@ -61,13 +68,13 @@ int main(int argc, char* argv[]) {
 
   reader.close();
   resampler.close();
-  backend.terminate();
+  backend.terminate();*/
 
 
 
   /*App app = App(1080, 540);
   app.init("VibeTunes");
-
+  
 	std::vector<App::FontFace> fontFaces{
 		{ "fonts/LatoLatin-Regular.ttf", false },
 		{ "fonts/LatoLatin-Italic.ttf", false },
